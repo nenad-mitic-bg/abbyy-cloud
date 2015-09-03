@@ -1,0 +1,19 @@
+{
+    "name": "shonezlo/abbyy-cloud",
+    "description": "Interface for communication with ABBYY cloud OCR",
+    "license": "WTFPL",
+    "authors": [
+        {
+            "name": "Nenad Mitic",
+            "email": "shonezlo@gmail.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "6.0.2"
+    },
+    "autoload": {
+        "psr-0": {
+            "ShoneZlo\\AbbyyCloud": "src/"
+        }
+    }
+}
