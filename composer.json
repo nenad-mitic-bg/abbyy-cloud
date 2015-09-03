@@ -11,6 +11,9 @@
     "require": {
         "guzzlehttp/guzzle": "6.0.2"
     },
+    "require-dev": {
+        "phpunit/phpunit": "4.8.6"
+    },
     "autoload": {
         "psr-0": {
             "ShoneZlo\\AbbyyCloud": "src/"
