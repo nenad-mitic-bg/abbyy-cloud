@@ -3,6 +3,7 @@
 namespace ShoneZlo\AbbyyCloud;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
 
 class AbbyyClient
 {
@@ -13,14 +14,14 @@ class AbbyyClient
     private $api;
 
     /**
-     * @param string $appId
+     * @param string $appName
      * @param string $password
      */
-    public function __construct($appId, $password)
+    public function __construct($appName, $password)
     {
         $this->api = new Client([
             'base_uri' => 'http://cloud.ocrsdk.com/',
-            'auth' => [$appId, $password]
+            'auth' => [$appName, $password]
         ]);
     }
 
@@ -41,13 +42,12 @@ class AbbyyClient
             }
         }
 
-        $resp = (new Client())->get($task->getResultUrl());
-
-        if ($resp->getStatusCode() === 200) {
+        try {
+            $resp = (new Client())->get($task->getResultUrl());
             return $resp->getBody()->getContents();
+        } catch (BadResponseException $ex) {
+            throw AbbyyException::parseXml($ex->getResponse()->getBody()->getContents(), $ex->getCode());
         }
-
-        throw new AbbyyException($resp->getBody()->getContents(), $resp->getStatusCode());
     }
 
     /**
@@ -68,13 +68,12 @@ class AbbyyClient
             'body' => fopen($inputFilePath, 'r')
         ];
 
-        $resp = $this->api->post('processImage', $options);
-
-        if ($resp->getStatusCode() === 200) {
+        try {
+            $resp = $this->api->post('processImage', $options);
             return AbbyyTask::parseXml($resp->getBody()->getContents());
+        } catch (BadResponseException $ex) {
+            throw AbbyyException::parseXml($ex->getResponse()->getBody()->getContents(), $ex->getCode());
         }
-
-        throw new AbbyyException($this->getErrorMessage($resp->getBody()->getContents()), $resp->getStatusCode());
     }
 
     /**
@@ -88,23 +87,12 @@ class AbbyyClient
             'query' => ['taskid' => $task->getId()]
         ];
 
-        $resp = $this->api->get('/getTaskStatus', $options);
-
-        if ($resp->getStatusCode() === 200) {
+        try {
+            $resp = $this->api->get('/getTaskStatus', $options);
             return AbbyyTask::parseXml($resp->getBody()->getContents());
+        } catch (BadResponseException $ex) {
+            throw AbbyyException::parseXml($ex->getResponse()->getBody()->getContents(), $ex->getCode());
         }
-
-        throw new AbbyyException($this->getErrorMessage($resp->getBody()->getContents()), $resp->getStatusCode());
-    }
-
-    /**
-     * @param string $xmlString
-     * @return string
-     */
-    private function getErrorMessage($xmlString)
-    {
-        $xml = simplexml_load_string($response);
-        return '' . $xml->message;
     }
 
 }
