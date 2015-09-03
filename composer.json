@@ -1,5 +1,6 @@
 {
     "name": "shonezlo/abbyy-cloud",
+    "version": "1.0.0",
     "description": "Interface for communication with ABBYY cloud OCR",
     "license": "WTFPL",
     "authors": [
